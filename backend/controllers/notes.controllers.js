@@ -17,15 +17,33 @@ const getNotes = async (req, res) => {
     })
 }
 
+const getNote = async (req, res) => {
+    const noteId = req.params.noteId
+    const query = `
+        SELECT * FROM notes WHERE id = ${noteId};
+    `
+    connection.query(query, async (err, rows) => {
+        if(err) {
+            return res.status(400).json({
+                message: "Error"
+            })
+        }
+        res.status(200).json({
+            message: "Berhasil mengambil data notes",
+            data: rows[0]
+        })
+    })
+}
+
 const postNote = async (req, res) => {
-    const { judul, tanggal, isi } = req.body
+    const { judul, tanggal, isi, tema } = req.body
     
-    if(!judul || !tanggal || !isi) {
+    if(!judul || !tanggal || !isi || !tema) {
         return res.status(400).json({
             message: "Semua field dibutuhkan"
         })
     }
-    connection.query("INSERT INTO notes (judul, tanggal, isi) VALUES(?, ?, ?)", [judul, tanggal, isi], (err, rows) => {
+    connection.query("INSERT INTO notes (judul, tanggal, isi, tema) VALUES(?, ?, ?, ?)", [judul, tanggal, isi, tema], (err, rows) => {
         if(err) {
             return res.status(400).json({
                 message: "Error"
@@ -41,19 +59,18 @@ const postNote = async (req, res) => {
 
 const editNote = async (req, res) => {
     const noteId = req.params.noteId
-    const { judul, tanggal, isi } = req.body
-    if(!judul || !tanggal || !isi) {
+    const { judul, tanggal, isi, tema } = req.body
+    if(!judul || !tanggal || !isi || !tema) {
         return res.status(400).json({
             message: "Semua field dibutuhkan"
         })
     }
     const query = `
         UPDATE notes
-        SET judul = '${judul}', tanggal = '${tanggal}', isi = '${isi}'
+        SET judul = '${judul}', tanggal = '${tanggal}', isi = '${isi}', tema = '${tema}'
         WHERE id = ${+noteId}
     `
     connection.query(query, (err, row) => {
-        console.log(err)
         if(err) {
             return res.status(400).json({
                 message: "Error"
@@ -89,6 +106,7 @@ const deleteNote = async (req, res) => {
 
 module.exports = {
     getNotes,
+    getNote,
     postNote,
     editNote,
     deleteNote
