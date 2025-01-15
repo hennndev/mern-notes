@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
-import SearchInput from '../components/SearchInput'
+import Notes from '../components/Notes'
 import ModalForm from '../components/ModalForm'
+import SearchInput from '../components/SearchInput'
 
 const Homepage = () => {
+    const [isEdit, setIsEdit] = useState(null)
     const [isModal, setIsModal] = useState(false)
 
     return (
@@ -17,10 +19,21 @@ const Homepage = () => {
                         </button>
                     </div>
                 </div>
+                <div className='mt-10 mb-10'>
+                    <Notes handleOpenModal={(noteId) => {
+                        setIsModal(true)
+                        setIsEdit(noteId)
+                    }}/>
+                </div>
             </div>
 
             {isModal && (
-                <ModalForm closeModal={() => setIsModal(false)}/>
+                <ModalForm 
+                    isEdit={isEdit}
+                    closeModal={() => {
+                        setIsModal(false)
+                        setIsEdit(null)
+                    }}/>
             )}
         </main>
     )
